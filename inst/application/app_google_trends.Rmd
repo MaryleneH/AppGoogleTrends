@@ -87,7 +87,7 @@ observeEvent(input$envoi_report, {
         str_c("_trends_report.pdf")
     
     rmarkdown::render(
-        input         = "reporting_template.Rmd", 
+        input         = reporting, 
         output_format = "pdf_document", 
         output_file   = file_path, 
         output_dir    = "reporting",

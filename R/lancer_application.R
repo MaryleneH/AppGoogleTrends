@@ -8,6 +8,7 @@ lancer_application <- function() {
   appDir <- system.file("application", package = "AppGoogleTrends")  ;
   #shiny::runApp(appDir, display.mode = "normal")
   fichier <- paste0(appDir, "/app_google_trends.Rmd")
+  reporting <- paste0(appDir,"/reporting_template.Rmd")
   rmarkdown::run(file = fichier,
                  default_file = NULL,
                  auto_reload = TRUE,
