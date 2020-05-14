@@ -1,0 +1,296 @@
+---
+title: "Analyse Google Trends - les requêtes sur les formats de fichiers"
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+    social: menu
+    source: embed
+runtime: shiny
+---
+
+```{r global, include=FALSE}
+# chargement des packages de l'écosystème Shiny qui nous serons utiles
+library(shiny)
+library(flexdashboard)
+library(shinycssloaders)
+
+# Pour se connecter à l'API Google Trends 
+library(gtrendsR)
+
+# Les packages pour mettre en forme les données et réaliser les graphiques ----
+library(tidyverse)
+library(lubridate)
+library(tidyquant)
+library(plotly)
+
+# File System
+library(fs)
+
+# Paramètres par défaut
+
+default_list_terms <- c("csv", "json", "rdf")
+# default_list_terms <- c("covid19")
+
+```
+ 
+
+Analysis {.sidebar}
+-----------------------------------------------------------------------
+
+**Google Trends** est un outil issu de Google Labs permettant de connaître la fréquence à laquelle un terme a été tapé dans le moteur de recherche Google, avec la possibilité de visualiser ces données par région et par langue.
+
+Afin de compléter l'analyse des besoins utilisateurs en termes de format de fichier, nous nous intéresssons aux requêtes de recherche Google effectuées par les internautes. Cette application utilise l'API Google Trends (grâce au package R `gtrendsR`). 
+
+
+```{r}
+shiny::selectizeInput(inputId  = "search_terms",
+                      selected = default_list_terms,
+                      choices  = c("csv", "api","json", "rdf", "xlsx", "xml"),
+                      label    = "Les termes tapés dans une requête",
+                      multiple = TRUE)
+
+# shiny::selectizeInput(inputId  = "search_terms",
+#                       selected = default_list_terms,
+#                       choices  = c("coronavirus", "covid19"),
+#                       label    = "Les termes d'une requête",
+#                       multiple = TRUE)
+# 
+#actionButton(inputId = "submit_search", label = "Lancer l'analyse ")
+br()
+br()
+
+
+shiny::selectInput(inputId = "term_selected", 
+                   label = "recherches des sujets liés au mot clé", 
+                   choices = c("csv", "api","json", "rdf", "xlsx", "xml"),
+                   selected = "rdf",
+                   multiple = FALSE)
+
+br()
+br()
+actionButton(inputId = "envoi_report", label = "Editer un reporting")
+```
+
+
+```{r}
+
+#Lorsque l'on actionne le bouton : 'editer un reporting'
+observeEvent(input$envoi_report, {
+    
+    # 2.1 Report Parameters ----
+    search_terms <- input$search_terms 
+    
+    # Make Report
+    file_path <- now() %>%
+        str_replace_all("[[:punct:]]", "_") %>%
+        str_replace(" ", "T") %>%
+        str_c("_trends_report.pdf")
+    
+    rmarkdown::render(
+        input         = "reporting_template.Rmd", 
+        output_format = "pdf_document", 
+        output_file   = file_path, 
+        output_dir    = "reporting",
+        params        = list(search_terms = search_terms)
+    )
+    
+  
+})
+```
+
+
+```{r}
+
+
+gtrends_lst <-reactive({input$search_terms})
+
+```
+
+
+
+-----------------------------------------------------------------------
+
+### **Mots clés**  des requêtes sur les formats de fichiers sur **les cinq dernières années - France** :
+
+```{r}
+
+output$time_plot <- renderPlotly({
+    
+   # req(gtrends_lst())
+    
+    g1 <- gtrends_lst() %>%
+        gtrends(geo = "FR", time = "today+5-y")%>% 
+        pluck("interest_over_time") %>% 
+        mutate(hits = as.numeric(hits)) %>%
+        as_tibble() %>%
+        ggplot(aes(date, hits, color = keyword)) +
+        geom_line() +
+        geom_smooth(span = 0.3, se = FALSE) +
+        theme_tq() +
+        scale_color_tq() +
+        labs(title = "Part des requêtes contenant le mot clé - évolution sur cinq ans - France") 
+    
+    ggplotly(g1)
+    
+}) 
+
+plotlyOutput("time_plot") 
+
+```
+
+***
+Google Trends permet d'accéder à un échantillon, essentiellement non filtré, de requêtes de recherche réelles effectuées sur Google. Elles sont anonymes (les internautes ne sont pas identifiés personnellement), catégorisées (en fonction du sujet de la recherche) et agrégées. Il est ainsi possible d'analyser l'intérêt marqué par les internautes effectuant des recherches via Google pour un sujet particulier. L'analyse peut porter sur les internautes du monde entier, d'un état en particulier, d'une région ou encore au niveau d'une ville.
+  [Pour en savoir plus sur Google Trends](https://trends.google.fr/trends/?geo=FR)
+  
+Pour rendre l'analyse entre les mots-clés plus simple, Google Trends effectue une normalisation des données de requêtes (voir détail onglet suivant). 
+
+
+  
+***
+-----------------------------------------------------------------------
+
+### **Mots clés**  des requêtes sur les formats de fichiers **depuis 2004 - France** :
+
+```{r}
+
+output$time_plot_all <- renderPlotly({
+    
+    #req(gtrends_lst())
+    
+    g <- gtrends_lst() %>%
+        gtrends(geo = "FR", time = "all")%>% 
+        pluck("interest_over_time") %>% 
+        mutate(hits = as.numeric(hits)) %>%
+        as_tibble() %>%
+        ggplot(aes(date, hits, color = keyword)) +
+        geom_line() +
+        geom_smooth(span = 0.3, se = FALSE) +
+        theme_tq() +
+        scale_color_tq() +
+        labs(title = "Part des requêtes par mot clé - évolution depuis 2004 - France") 
+    
+   ggplotly(g)
+    
+    
+}) 
+
+plotlyOutput("time_plot_all") 
+
+```
+
+***
+
+Pour rendre l'analyse entre les mots-clés plus simple, Google Trends effectue une normalisation des données de requêtes. 
+
+Les résultats de recherche sont normalisés en fonction de l'heure et du lieu d'une requête, selon le processus suivant :
+
+- Chaque point de données est divisé par le nombre total de recherches effectuées pour la période et le lieu qu'il représente, afin d'effectuer un comparatif de la popularité relative. Cela permet d'éviter que les lieux générant les volumes de recherche les plus importants soient toujours les mieux classés.
+
+- Les chiffres obtenus sont ensuite classés sur une échelle de 0 à 100, selon la proportion d'un sujet par rapport à toutes les recherches portant sur tous les sujets.
+
+- Deux régions présentant la même proportion de recherches pour un terme ne totalisent pas nécessairement le même volume de recherches.
+
+Les données sont indexées à 100 - 100 représentant le maximum de requêtes pour la durée et la localisation selectionnées.
+
+[Pour en savoir plus sur l'exploitation des données Google Trends](https://medium.com/google-news-lab/what-is-google-trends-data-and-what-does-it-mean-b48f07342ee8)
+
+***
+
+
+### Analyse des requêtes liées au mot clé - **sur les cinq dernières années**
+
+
+```{r}
+renderPlotly({
+    
+   # req(rv$gtrends_lst)
+    
+    n_terms <- 10
+
+    top_n_related_searches_tbl <- gtrends_lst() %>%
+        gtrends(geo = "FR", time = "today+5-y") %>%
+        pluck("related_queries") %>%
+        as_tibble() %>%
+        filter(related_queries == "top") %>%
+        mutate(interest = as.numeric(subject)) %>%
+        
+        select(keyword, value, interest) %>%
+        group_by(keyword) %>%
+        arrange(desc(interest)) %>%
+        slice(1:n_terms) %>%
+        ungroup() %>%
+        
+        mutate(value = as_factor(value) %>% fct_reorder(interest))
+    
+    g <- top_n_related_searches_tbl %>%
+        ggplot(aes(value, interest, color = keyword)) +
+        geom_segment(aes(xend = value, yend = 0)) +
+        geom_point() +
+        coord_flip() +
+        facet_wrap(~ keyword, ncol = 1, scales = "free_y") +
+        theme_tq() +
+        scale_color_tq()+
+        labs(y = " ")
+    
+    
+    ggplotly(g)
+    
+})
+
+
+```
+
+
+### Quels sont les **sujets** liés au mot clé - **depuis 2004**
+
+```{r}
+    # récupérer le terme sélectionné dans le menu déroulant
+    terme_sel <-reactive({input$term_selected})
+```
+
+```{r}
+renderPlotly({
+    
+   # req(rv$gtrends_lst)
+    
+    n_terms <- 25
+    
+    
+    terme_gtrends_all <- terme_sel() %>%gtrends(geo = "FR", time = "all")
+  
+  
+
+    top_n_related_topics_tbl <- terme_gtrends_all %>%
+        pluck("related_topics") %>%
+        as_tibble() %>%
+        filter(related_topics == "top") %>%
+        mutate(interest = as.numeric(subject)) %>%
+        
+        select(keyword, value, interest) %>%
+        group_by(keyword) %>%
+        arrange(desc(interest)) %>%
+        slice(1:n_terms) %>%
+        ungroup() %>%
+        
+        mutate(value = as_factor(value) %>% fct_reorder(interest))
+    
+    g_top <- top_n_related_topics_tbl %>%
+        ggplot(aes(value, interest, color = keyword)) +
+        geom_segment(aes(xend = value, yend = 0)) +
+        geom_point() +
+        coord_flip() +
+        facet_wrap(~ keyword, ncol = 1, scales = "free_y") +
+        theme_tq() +
+        labs(y = " ")+
+        scale_color_tq()
+        
+    
+    
+    ggplotly(g_top)
+    
+})
+
+
+```
+
+

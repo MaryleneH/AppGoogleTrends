@@ -1,0 +1,26 @@
+Package: AppGoogleTrends
+Title: application analyse tendance requetes GoogleTrends
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Marylene",
+           family = "Henry",
+           role = c("aut", "cre"),
+           email = "marylene.henry@gmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: pour un certain nombre de mots cles relatifs a la diffusion de fichiers analyse Google Trends.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
+Imports: 
+    shiny,
+    rmarkdown,
+    shinycssloaders,
+    flextable,
+    tidyverse,
+    lubridate,
+    tidyquant,
+    plotly,
+    fs,
+    gtrendsR
+    
