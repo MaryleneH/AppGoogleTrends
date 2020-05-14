@@ -5,3 +5,11 @@ Package à but exploratoire - uniquement pour rendre la consultation des visuali
 Le but : utiliser Google Trends pour mesurer l'intérêt des internautes effectuant des requêtes contenant certains mots clés 
 via le moteur de recherche Google.
 
+Pour utliser le package
+
+devtools::install_github("MaryleneH/AppGoogleTrends")
+library(AppGoogleTrends)
+AppGoogleTrends::lancer_application()
+
+L'application Shiny est prête à l'emploi.
+
