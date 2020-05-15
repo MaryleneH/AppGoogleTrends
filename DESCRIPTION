@@ -16,7 +16,7 @@ Imports:
     shiny,
     rmarkdown,
     shinycssloaders,
-    flextable,
+    flexdashboard,
     tidyverse,
     lubridate,
     tidyquant,

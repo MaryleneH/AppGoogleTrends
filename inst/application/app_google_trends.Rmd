@@ -23,13 +23,13 @@ library(lubridate)
 library(tidyquant)
 library(plotly)
 
-# File System
 library(fs)
+
 
 # Paramètres par défaut
 
 default_list_terms <- c("csv", "json", "rdf")
-# default_list_terms <- c("covid19")
+
 
 ```
  
@@ -56,7 +56,7 @@ shiny::selectInput(inputId = "term_selected",
                    selected = "rdf",
                    multiple = FALSE)
 
-br()
+
 
 
 
