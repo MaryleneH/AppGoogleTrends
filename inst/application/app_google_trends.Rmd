@@ -49,16 +49,6 @@ shiny::selectizeInput(inputId  = "search_terms",
                       label    = "Les termes tapés dans une requête",
                       multiple = TRUE)
 
-# shiny::selectizeInput(inputId  = "search_terms",
-#                       selected = default_list_terms,
-#                       choices  = c("coronavirus", "covid19"),
-#                       label    = "Les termes d'une requête",
-#                       multiple = TRUE)
-# 
-#actionButton(inputId = "submit_search", label = "Lancer l'analyse ")
-br()
-br()
-
 
 shiny::selectInput(inputId = "term_selected", 
                    label = "recherches des sujets liés au mot clé", 
@@ -67,36 +57,12 @@ shiny::selectInput(inputId = "term_selected",
                    multiple = FALSE)
 
 br()
-br()
-actionButton(inputId = "envoi_report", label = "Editer un reporting")
+
+
+
 ```
 
 
-```{r}
-
-#Lorsque l'on actionne le bouton : 'editer un reporting'
-observeEvent(input$envoi_report, {
-    
-    # 2.1 Report Parameters ----
-    search_terms <- input$search_terms 
-    
-    # Make Report
-    file_path <- now() %>%
-        str_replace_all("[[:punct:]]", "_") %>%
-        str_replace(" ", "T") %>%
-        str_c("_trends_report.pdf")
-    
-    rmarkdown::render(
-        input         = reporting, 
-        output_format = "pdf_document", 
-        output_file   = file_path, 
-        output_dir    = "reporting",
-        params        = list(search_terms = search_terms)
-    )
-    
-  
-})
-```
 
 
 ```{r}
