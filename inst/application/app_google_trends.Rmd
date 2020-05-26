@@ -87,7 +87,7 @@ output$time_plot <- renderPlotly({
     g1 <- gtrends_lst() %>%
         gtrends(geo = "FR", time = "today+5-y")%>% 
         pluck("interest_over_time") %>% 
-        mutate(hits = as.numeric(hits)) %>%
+        dplyr::mutate(hits = as.numeric(hits)) %>%
         as_tibble() %>%
         ggplot(aes(date, hits, color = keyword)) +
         geom_line() +
@@ -126,7 +126,7 @@ output$time_plot_all <- renderPlotly({
     g <- gtrends_lst() %>%
         gtrends(geo = "FR", time = "all")%>% 
         pluck("interest_over_time") %>% 
-        mutate(hits = as.numeric(hits)) %>%
+        dplyr::mutate(hits = as.numeric(hits)) %>%
         as_tibble() %>%
         ggplot(aes(date, hits, color = keyword)) +
         geom_line() +
@@ -178,7 +178,7 @@ renderPlotly({
         pluck("related_queries") %>%
         as_tibble() %>%
         filter(related_queries == "top") %>%
-        mutate(interest = as.numeric(subject)) %>%
+        dplyr::mutate(interest = as.numeric(subject)) %>%
         
         select(keyword, value, interest) %>%
         group_by(keyword) %>%
@@ -230,7 +230,7 @@ renderPlotly({
         pluck("related_topics") %>%
         as_tibble() %>%
         filter(related_topics == "top") %>%
-        mutate(interest = as.numeric(subject)) %>%
+        dplyr::mutate(interest = as.numeric(subject)) %>%
         
         select(keyword, value, interest) %>%
         group_by(keyword) %>%
