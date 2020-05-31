@@ -16,3 +16,6 @@ via le moteur de recherche Google.
 
 L'application Shiny est prête à l'emploi.
 
+NB : Si problème de création des graphiques (error 401), il faut utliser la version de dev du package `gtrends`.
+(*devtools::install_github("PMassicotte/gtrendsR")* puis relancer l'application shiny)
+
