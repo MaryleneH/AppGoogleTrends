@@ -174,7 +174,7 @@ renderPlotly({
     n_terms <- 10
 
     top_n_related_searches_tbl <- gtrends_lst() %>%
-        gtrends(geo = "FR", time = "today+5-y",onlyInterest = TRUE) %>%
+        gtrends(geo = "FR", time = "today+5-y") %>%
         pluck("related_queries") %>%
         as_tibble() %>%
         filter(related_queries == "top") %>%
@@ -222,7 +222,7 @@ renderPlotly({
     n_terms <- 25
     
     
-    terme_gtrends_all <- terme_sel() %>%gtrends(geo = "FR", time = "all",onlyInterest = TRUE)
+    terme_gtrends_all <- terme_sel() %>%gtrends(geo = "FR", time = "all")
   
   
 
