@@ -85,7 +85,7 @@ output$time_plot <- renderPlotly({
    # req(gtrends_lst())
     
     g1 <- gtrends_lst() %>%
-        gtrends(geo = "FR", time = "today+5-y")%>% 
+        gtrends(geo = "FR", time = "today+5-y",onlyInterest = TRUE)%>% 
         pluck("interest_over_time") %>% 
         dplyr::mutate(hits = as.numeric(hits)) %>%
         as_tibble() %>%
@@ -124,7 +124,7 @@ output$time_plot_all <- renderPlotly({
     #req(gtrends_lst())
     
     g <- gtrends_lst() %>%
-        gtrends(geo = "FR", time = "all")%>% 
+        gtrends(geo = "FR", time = "all",onlyInterest = TRUE)%>% 
         pluck("interest_over_time") %>% 
         dplyr::mutate(hits = as.numeric(hits)) %>%
         as_tibble() %>%
@@ -174,7 +174,7 @@ renderPlotly({
     n_terms <- 10
 
     top_n_related_searches_tbl <- gtrends_lst() %>%
-        gtrends(geo = "FR", time = "today+5-y") %>%
+        gtrends(geo = "FR", time = "today+5-y",onlyInterest = TRUE) %>%
         pluck("related_queries") %>%
         as_tibble() %>%
         filter(related_queries == "top") %>%
@@ -222,7 +222,7 @@ renderPlotly({
     n_terms <- 25
     
     
-    terme_gtrends_all <- terme_sel() %>%gtrends(geo = "FR", time = "all")
+    terme_gtrends_all <- terme_sel() %>%gtrends(geo = "FR", time = "all",onlyInterest = TRUE)
   
   
 
