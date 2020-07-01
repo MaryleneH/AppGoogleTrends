@@ -45,14 +45,14 @@ Afin de compléter l'analyse des besoins utilisateurs en termes de format de fic
 ```{r}
 shiny::selectizeInput(inputId  = "search_terms",
                       selected = default_list_terms,
-                      choices  = c("csv", "api","json", "rdf", "xlsx", "xml"),
+                      choices  = c("csv", "api","json", "rdf", "xlsx", "xml", "excel"),
                       label    = "Les termes tapés dans une requête",
                       multiple = TRUE)
 
 
 shiny::selectInput(inputId = "term_selected", 
                    label = "recherches des sujets liés au mot clé", 
-                   choices = c("csv", "api","json", "rdf", "xlsx", "xml"),
+                   choices = c("csv", "api","json", "rdf", "xlsx", "xml","excel"),
                    selected = "rdf",
                    multiple = FALSE)
 
